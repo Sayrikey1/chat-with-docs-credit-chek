@@ -11,6 +11,7 @@ class ChatbotResponse(BaseModel):
 
     class Config:
         from_attributes = True  # Enables compatibility with SQLAlchemy models
+        arbitrary_types_allowed = True
 
 class UserSignupSchema(BaseModel):
     first_name: str # User's first name

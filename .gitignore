@@ -1,3 +1,5 @@
 chatwdocs
 __pycache__
 .env
+app.log
+test.txt
