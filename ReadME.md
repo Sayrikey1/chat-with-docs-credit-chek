@@ -1,33 +1,45 @@
-Below is the updated Markdown documentation with an added "Frontend Screenshots" section that embeds image screenshots arranged in a 2×2 grid. In this example, the images are referenced from the local directory (assumed to be available as relative paths in your repository):
-
----
-
 # CreditCheck Chat Application 💬
 
 ## Overview 📋
 
-The CreditCheck Chat Application is a web-based platform designed to assist users with credit assessments and financial guidance. It leverages a chatbot powered by advanced NLP techniques to provide seamless interactions and support for various credit-related queries. The application is built using FastAPI for the backend and Streamlit for the frontend.
+The CreditCheck Chat Application is a web-based platform designed to assist users with credit assessments and financial guidance by interacting with API documentation. It leverages a chatbot powered by advanced NLP techniques to provide seamless interactions and support for various credit-related queries. The application is built using FastAPI for the backend and Streamlit for the frontend.
 
-## How It Works: Embedding Model & LLM Integration 🔍🤖
+## Vector Indexing Now Offset to Database
 
-The backend code integrates two key AI components:
+Previously, vector indexing was handled locally. Now, all vector indexing and storage are managed through a dedicated database, specifically **Pinecone** for enhanced scalability and performance. Pinecone is a managed vector database service that allows efficient similarity search over large datasets.  
+[Learn more about Pinecone](https://www.pinecone.io/).
 
-1. **Embedding Model**:  
-   The application uses the [HuggingFaceEmbeddings](https://huggingface.co/sentence-transformers/all-mpnet-base-v2) class with the model **"sentence-transformers/all-mpnet-base-v2"**.  
-   - **Purpose**: This transformer-based model converts text into dense vector representations (embeddings) that capture the semantic meaning of the input.  
-   - **Context**: The embeddings are used to build a vector index from documents, enabling efficient similarity search and retrieval, which is crucial for a retrieval-augmented generation (RAG) pipeline.
+### **Important Update**:
+- **Force Reload**: When new data is added, set `FORCE_RELOAD_INDEX=true` to trigger a full refresh of the vector index.
 
-2. **Language Model (LLM)**:  
-   The language model is initialized using the [Groq](https://www.groq.com/) integration with the model **"llama-3.3-70b-versatile"**.  
-   - **Purpose**: This LLM generates natural language responses based on the query context.  
-   - **Context**: By coupling the semantic power of the embedding model with the generative capabilities of the LLM, the system can provide precise, context-aware responses to user queries. The Groq API handles the inference, making it possible to generate high-quality answers quickly.
+## Environment Variables Example
 
-These components work together within the `llama_index` framework to create a robust query engine. The embedding model encodes incoming documents and queries into vector space, while the LLM uses this information to generate responses that are both relevant and insightful.
+To configure the application, create a `.env` file in the root directory and add the following variables:
+
+```env
+DB_HOST=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DB_NAME=xxxxxxxxxxxxxx
+DB_PASSWORD=xxxxxxxxxxxxxx
+DB_PORT=5000
+DB_USERNAME=xxxxxxxxxxxx
+
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
+
+JWT_ALGORITHM=HS256 
+JWT_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+SQLALCHEMY_WARN_20=1   
+PINECONE_API_KEY=pcsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+FORCE_RELOAD_INDEX=true
+```
+
+Ensure that you update these values with your actual configuration when deploying the application.
 
 ## Features ✨
 
 - 📝 User Registration and Authentication
-- 🤖 Chatbot for Credit Assessments and Financial Guidance
+- 🤖 Chatbot for Credit Assessments and Financial Guidance via API docs
 - 👤 User Profile Management
 - 🗂️ Conversation History
 
@@ -36,6 +48,7 @@ These components work together within the `llama_index` framework to create a ro
 - **Backend**: FastAPI, SQLAlchemy, Alembic, Pydantic  
 - **Frontend**: Streamlit  
 - **Database**: PostgreSQL  
+- **Vector Database**: [Pinecone](https://www.pinecone.io/)  
 - **AI & NLP**:  
   - **Embedding Model**: [sentence-transformers/all-mpnet-base-v2](https://huggingface.co/sentence-transformers/all-mpnet-base-v2)  
   - **Language Model**: [Groq's llama-3.3-70b-versatile](https://www.groq.com/)  
@@ -43,13 +56,14 @@ These components work together within the `llama_index` framework to create a ro
 
 ## Frontend Screenshots 📸
 
-Below are some screenshots of the frontend, arranged in a 2×2 grid for a concise view:
+Below are some screenshots of the frontend, arranged in a 2×2 grid:
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-  <img src="./images/screenshot1.png" alt="Frontend Screenshot 1" style="width:100%;" />
-  <img src="./images/screenshot2.png" alt="Frontend Screenshot 2" style="width:100%;" />
-  <img src="./images/screenshot3.png" alt="Frontend Screenshot 3" style="width:100%;" />
-  <img src="./images/screenshot4.png" alt="Frontend Screenshot 4" style="width:100%;" />
+  <img src="./images/screenshot01.png" alt="Frontend Screenshot 1" style="width:100%;" />
+  <img src="./images/screenshot02.png" alt="Frontend Screenshot 2" style="width:100%;" />
+  <img src="./images/screenshot03.png" alt="Frontend Screenshot 3" style="width:100%;" />
+  <img src="./images/screenshot04.png" alt="Frontend Screenshot 4" style="width:100%;" />
+  <img src="./images/screenshot05.png" alt="Frontend Screenshot 4" style="width:100%;" />
 </div>
 
 ## Installation ⚙️
@@ -71,64 +85,52 @@ cd creditcheck-chat-application
 
 1. **Create a virtual environment and activate it:**
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-```
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+    ```
 
 2. **Install the required dependencies:**
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 3. **Set up environment variables:**
 
-Create a `.env` file in the root directory and add the following variables:
-
-```env
-DB_NAME=your_db_name
-DB_PASSWORD=your_db_password
-DB_HOST=your_db_host
-DB_PORT=your_db_port
-DB_USERNAME=your_db_username
-JWT_SECRET_KEY=your_jwt_secret_key
-JWT_ALGORITHM=HS256
-JWT_TOKEN_EXPIRY_MINUTES=1440
-GROQ_API_KEY=your_groq_api_key
-```
+    Create a `.env` file and add your database credentials, API keys, and vector indexing settings as shown in the example above.
 
 4. **Run database migrations:**
 
-```bash
-alembic upgrade head
-```
+    ```bash
+    alembic upgrade head
+    ```
 
 5. **Start the backend server:**
 
-```bash
-uvicorn main:app --reload
-```
+    ```bash
+    uvicorn main:app --reload
+    ```
 
 ### Frontend Setup 🖥️
 
 1. **Navigate to the frontend directory:**
 
-```bash
-cd frontend
-```
+    ```bash
+    cd frontend
+    ```
 
 2. **Install frontend dependencies:**
 
-```bash
-npm install
-```
+    ```bash
+    npm install
+    ```
 
 3. **Start the frontend application:**
 
-```bash
-streamlit run app.py
-```
+    ```bash
+    streamlit run app.py
+    ```
 
 ## Usage 🚀
 
@@ -146,9 +148,9 @@ streamlit run app.py
 
 ### Chatbot Interaction 🤖
 
-1. After logging in, navigate to the "Chatbot" page.
-2. Type your message in the input box and click "Send".
-3. The chatbot will respond to your queries, powered by the embedding model and LLM integration.
+1. Navigate to the "Chatbot" page.
+2. Type your message and click "Send".
+3. The chatbot will respond based on API documentation queries, using vector-indexed documents from Pinecone and LLM-generated content.
 
 ### User Profile 👤
 
@@ -162,9 +164,7 @@ creditcheck-chat-application/
 ├── alembic/
 │   ├── versions/
 │   ├── env.py
-│   ├── README
-│   ├── script.py.mako
-│   └── alembic.ini
+│   ├── alembic.ini
 ├── config/
 │   ├── config.py
 │   └── database.py
@@ -180,7 +180,6 @@ creditcheck-chat-application/
 ├── rag/
 │   ├── crawler.py
 │   ├── data/
-│   │   └── extractions.py
 │   └── query_engine.py
 ├── routers/
 │   ├── auth.py
@@ -192,16 +191,12 @@ creditcheck-chat-application/
 
 ## Contributing 🤝
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes.
+Contributions are welcome! Fork the repository and submit a pull request with your changes.
 
 ## License 📄
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## Contact 📧
 
-For any questions or inquiries, please contact [Sayrikey1](https://github.com/Sayrikey1).
-
----
-
-This updated documentation highlights the integration of the embedding model and the LLM, which together enhance the application's ability to process and respond to user queries effectively. The frontend screenshots provide a visual overview of the user interface in a neatly arranged 2×2 grid. For more details on the models, refer to the provided links.
+For inquiries, contact [Sayrikey1](https://github.com/Sayrikey1).
